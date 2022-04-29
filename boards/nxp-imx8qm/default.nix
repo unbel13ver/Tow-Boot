@@ -1,38 +1,38 @@
 { config, lib, pkgs, ... }:
 
 let
+  imxurl = "https://www.nxp.com/lgfiles/NMG/MAD/YOCTO";
+
+  fwHdmiVersion = "8.15";
+  fwScVersion = "1.10.0";
+  fwSecoVersion = "3.8.2";
+
+  firmwareHdmi = pkgs.fetchurl rec {
+    url = "${imxurl}/firmware-imx-${fwHdmiVersion}.bin";
+    sha256 = "QQP7jcQBs/EZK9X+mwFumauEcpOiJNa0hHm+fMBOHB8=";
+    executable = true;
+  };
+
+  firmwareSc = pkgs.fetchurl rec {
+    url = "${imxurl}/imx-sc-firmware-${fwScVersion}.bin";
+    sha256 = "aQBefLYrR9SA0NoJJ6ZadwvMMcgroeKjpd8pUXbqCiI=";
+    executable = true;
+  };
+
+  firmwareSeco = pkgs.fetchurl rec {
+    url = "${imxurl}/imx-seco-${fwSecoVersion}.bin";
+    sha256 = "kks3aEZ0c+Z26yy9PP1Z06g97kvKG1Ck0wGNHeAk3RY=";
+    executable = true;
+  };
+
+  filesToInstall = [
+    "firmware-imx-${fwHdmiVersion}/firmware/hdmi/cadence/dpfw.bin"
+    "firmware-imx-${fwHdmiVersion}/firmware/hdmi/cadence/hdmi?xfw.bin"
+    "imx-sc-firmware-${fwScVersion}/mx8qm-mek-scfw-tcm.bin"
+    "imx-seco-${fwSecoVersion}/firmware/seco/mx8qmb0-ahab-container.img"
+  ];
+
   imx8firmware = pkgs.runCommandNoCC "imx8firmware" (rec {
-    imxurl = "https://www.nxp.com/lgfiles/NMG/MAD/YOCTO";
-
-    fwHdmiVersion = "8.15";
-    fwScVersion = "1.10.0";
-    fwSecoVersion = "3.8.2";
-
-    firmwareHdmi = pkgs.fetchurl rec {
-      url = "${imxurl}/firmware-imx-${fwHdmiVersion}.bin";
-      sha256 = "QQP7jcQBs/EZK9X+mwFumauEcpOiJNa0hHm+fMBOHB8=";
-      executable = true;
-    };
-
-    firmwareSc = pkgs.fetchurl rec {
-      url = "${imxurl}/imx-sc-firmware-${fwScVersion}.bin";
-      sha256 = "aQBefLYrR9SA0NoJJ6ZadwvMMcgroeKjpd8pUXbqCiI=";
-      executable = true;
-    };
-
-    firmwareSeco = pkgs.fetchurl rec {
-      url = "${imxurl}/imx-seco-${fwSecoVersion}.bin";
-      sha256 = "kks3aEZ0c+Z26yy9PP1Z06g97kvKG1Ck0wGNHeAk3RY=";
-      executable = true;
-    };
-
-    filesToInstall = [
-      "firmware-imx-${fwHdmiVersion}/firmware/hdmi/cadence/dpfw.bin"
-      "firmware-imx-${fwHdmiVersion}/firmware/hdmi/cadence/hdmi?xfw.bin"
-      "imx-sc-firmware-${fwScVersion}/mx8qm-mek-scfw-tcm.bin"
-      "imx-seco-${fwSecoVersion}/firmware/seco/mx8qmb0-ahab-container.img"
-    ];
-
     meta = with lib; {
       license = licenses.unfreeRedistributableFirmware;
     };
@@ -41,11 +41,11 @@ let
     ${firmwareHdmi} --auto-accept --force
     ${firmwareSc} --auto-accept --force
     ${firmwareSeco} --auto-accept --force
-    cp -vt $out ${filesToInstall}
+    cp -vt $out ${pkgs.lib.concatStringsSep " " filesToInstall}
   '';
 
   # Vendor fork, for now
-  imx8qmATF = pkgs.Tow-Boot.armTrustedFirmwareIMX8MQ;
+  imx8qmATF = pkgs.Tow-Boot.armTrustedFirmwareIMX8QM;
 in
 {
   device = {
@@ -64,7 +64,6 @@ in
   };
 
   Tow-Boot = {
-    version = "2021.04";
 
     src = fetchGit {
       url = "https://source.codeaurora.org/external/imx/uboot-imx.git";
