@@ -45,26 +45,17 @@ let
   '';
 
   # Vendor fork, for now
-  TF-A = pkgs.Tow-Boot.armTrustedFirmwareIMX8MQ.overrideAttrs({ ... }: {
-    src = pkgs.fetchFromGitLab {
-      domain = "source.puri.sm";
-      owner = "Librem5";
-      repo = "arm-trusted-firmware";
-      rev = "92c2de12d36b31938ce940d5cac3c30a98665237";
-      sha256 = "sha256-vlRI7Z5f8GQythI0g4G9u05STCvA/Qw3YUQrC3f5BYY=";
-    };
-  });
+  imx8qmATF = pkgs.Tow-Boot.armTrustedFirmwareIMX8MQ;
 in
 {
   device = {
-    manufacturer = "Purism";
-    name = "Librem 5";
-    identifier = "purism-librem5";
-    productPageURL = "https://puri.sm/products/librem-5/";
+    manufacturer = "NXP";
+    name = "i.MX8QuadMax";
+    identifier = "mx8qm-mek";
   };
 
   hardware = {
-    soc = "nxp-imx8mq";
+    soc = "nxp-imx8qm";
     # Winbond W25Q16JVUXIM TR SPI NOR Flash, 3V, 16M-bit
     # TODO: check if it is configured to start from SPI.
     # SPISize = 16 / 8 * 1024 * 1024; # 16Mb → 2MB
@@ -73,13 +64,13 @@ in
   };
 
   Tow-Boot = {
-    src = pkgs.fetchFromGitLab {
-      domain = "source.puri.sm";
-      owner = "Librem5";
-      repo = "uboot-imx";
-      rev = "cf03130d32f69fb78f404d64f1262b7f5c9ce4b5"; # upstream/librem5
-      sha256 = "sha256-+puBpx4StffFdrXdLv2SdadevdGxqLi974IQxgvQyls=";
+    version = "2021.04";
+
+    src = fetchGit {
+      url = "https://source.codeaurora.org/external/imx/uboot-imx.git";
+      ref = "lf_v2021.04";
     };
+
     useDefaultPatches = false; # until ported to 2022.04
 
     builder = {
@@ -88,7 +79,7 @@ in
         cp $BL31 bl31.bin
       '';
       additionalArguments = {
-        BL31 = lib.mkForce "${TF-A}/bl31.bin";
+        BL31 = lib.mkForce "${imx8qmATF}/bl31.bin";
       };
       makeFlags = [
         "BINMAN_DEBUG=1"
@@ -96,7 +87,7 @@ in
       ];
     };
 
-    defconfig = "librem5_defconfig";
+    defconfig = "imx8qm_mek_defconfig";
     ## phone-ux = {
     ##   enable = true;
     ##   blind = true;

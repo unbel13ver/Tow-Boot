@@ -119,4 +119,16 @@ in {
     extraMeta.platforms = ["aarch64-linux"];
     filesToInstall = [ "build/${platform}/release/bl31.bin"];
   };
+
+  armTrustedFirmwareiMX8QM = buildArmTrustedFirmware rec {
+    src = fetchGit {
+      url = "https://source.codeaurora.org/external/imx/imx-atf";
+      ref = "lf_v2.4";
+    };
+    platform = "imx8qm";
+    enableParallelBuilding = true;
+    extraMakeFlags = [ "bl31 SPD=opteed" ];
+    extraMeta.platforms = ["aarch64-linux"];
+    filesToInstall = ["build/${platform}/release/bl31.bin"];
+  };
 }
