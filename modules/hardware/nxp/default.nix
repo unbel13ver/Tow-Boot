@@ -38,12 +38,6 @@ in
           offset = 32 * 1024; # 32KiB into the image, or 64 × 512 long sectors, or 0x8000
           length = 4 * 1024 * 1024; # Expected max size
         };
-        builder.installPhase = ''
-          cp -v flash.bin $out/binaries/Tow-Boot.$variant.bin
-        '';
-        installer.additionalMMCBootCommands = ''
-          mmc partconf ${mmcBootIndex} 1 1 1
-        '';
       };
 
     })
@@ -51,6 +45,7 @@ in
       system.system = "aarch64-linux";
       Tow-Boot.builder.additionalArguments = {
         BL31 = "${pkgs.Tow-Boot.armTrustedFirmwareIMX8QM}/bl31.bin";
+        FIPDIR = "${pkgs.Tow-Boot.imxFirmware}";
       };
     })
 

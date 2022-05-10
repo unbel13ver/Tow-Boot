@@ -1,51 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  imxurl = "https://www.nxp.com/lgfiles/NMG/MAD/YOCTO";
-
-  fwHdmiVersion = "8.15";
-  fwScVersion = "1.10.0";
-  fwSecoVersion = "3.8.2";
-
-  firmwareHdmi = pkgs.fetchurl rec {
-    url = "${imxurl}/firmware-imx-${fwHdmiVersion}.bin";
-    sha256 = "QQP7jcQBs/EZK9X+mwFumauEcpOiJNa0hHm+fMBOHB8=";
-    executable = true;
-  };
-
-  firmwareSc = pkgs.fetchurl rec {
-    url = "${imxurl}/imx-sc-firmware-${fwScVersion}.bin";
-    sha256 = "aQBefLYrR9SA0NoJJ6ZadwvMMcgroeKjpd8pUXbqCiI=";
-    executable = true;
-  };
-
-  firmwareSeco = pkgs.fetchurl rec {
-    url = "${imxurl}/imx-seco-${fwSecoVersion}.bin";
-    sha256 = "kks3aEZ0c+Z26yy9PP1Z06g97kvKG1Ck0wGNHeAk3RY=";
-    executable = true;
-  };
-
-  filesToInstall = [
-    "firmware-imx-${fwHdmiVersion}/firmware/hdmi/cadence/dpfw.bin"
-    "firmware-imx-${fwHdmiVersion}/firmware/hdmi/cadence/hdmi?xfw.bin"
-    "imx-sc-firmware-${fwScVersion}/mx8qm-mek-scfw-tcm.bin"
-    "imx-seco-${fwSecoVersion}/firmware/seco/mx8qmb0-ahab-container.img"
-  ];
-
-  imx8firmware = pkgs.runCommandNoCC "imx8firmware" (rec {
-    meta = with lib; {
-      license = licenses.unfreeRedistributableFirmware;
-    };
-  }) ''
-    mkdir -p $out
-    ${firmwareHdmi} --auto-accept --force
-    ${firmwareSc} --auto-accept --force
-    ${firmwareSeco} --auto-accept --force
-    cp -vt $out ${pkgs.lib.concatStringsSep " " filesToInstall}
-  '';
-
-  # Vendor fork, for now
-  imx8qmATF = pkgs.Tow-Boot.armTrustedFirmwareIMX8QM;
+  mkimage = import ./imx-mkimage.nix;
 in
 {
   device = {
@@ -63,99 +19,48 @@ in
     # mmcBootIndex = "?";
   };
 
-  Tow-Boot = {
+  Tow-Boot = with pkgs.Tow-Boot; {
+
+    uBootVersion = "2021.04";
 
     src = fetchGit {
-      url = "https://source.codeaurora.org/external/imx/uboot-imx.git";
-      ref = "lf_v2021.04";
+        url = "https://source.codeaurora.org/external/imx/uboot-imx.git";
+        ref = "lf_v2021.04";
     };
+
+    defconfig = "imx8qm_mek_defconfig";
 
     useDefaultPatches = false; # until ported to 2022.04
 
     builder = {
-      preBuild = ''
-        cp -vt . ${imx8firmware}/*
-        cp $BL31 bl31.bin
-      '';
+
       additionalArguments = {
-        BL31 = lib.mkForce "${imx8qmATF}/bl31.bin";
+        #mkimage = pkgs.pkgsBuildHost.callPackage ./imx-mkimage.nix {
+        #  BL31 = armTrustedFirmwareIMX8QM;
+        #  imx-firmware = imxFirmware;
+        #  ubootImx8 = pkgs.Tow-Boot.outputs.firmware;
+        #};
       };
-      makeFlags = [
-        "BINMAN_DEBUG=1"
-        "BINMAN_VERBOSE=3"
-      ];
+
+      installPhase = ''
+        install -m 0755 u-boot.bin $out/binaries/
+        install -m 0755 spl/u-boot-spl.bin $out/binaries/
+        install -m 0755 u-boot.bin $out/binaries/Tow-Boot.$variant.bin
+        echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ${mkimage {pkgs=pkgs; ubootImx8="$out/binaries/";}}
+      '';
     };
 
-    defconfig = "imx8qm_mek_defconfig";
-    ## phone-ux = {
-    ##   enable = true;
-    ##   blind = true;
-    ##   wip = {
-    ##     led_R = "led-red";
-    ##     led_G = "led-green";
-    ##     led_B = "led-blue";
-    ##     mmcSD   = "1";
-    ##     mmcEMMC = "0";
-    ##   };
-    ## };
+   # preInstallPhases = [ "showWhatsHappening" ];
+#
+   # showWhatsHappening = ''
+   #   echo !&!&!&!&!&!&!&!&!&!&!&!&!&!&!&
+   #   ls -la
+   #   echo &!&!&!&!&!&!&!&!&!&!&!&!&!&!&!&
+   # '';
+        # 
 
     # Does not build right now, anyway blind UX.
     withLogo = false;
-    config = [
-      (helpers: with helpers; {
-        # I assume due to the missing display support in defconfig?
-        CMD_CLS = lib.mkForce no;
-      })
-
-      #(helpers: with helpers; {
-      #  BUTTON_GPIO = yes;
-      #  BUTTON_ADC = yes;
-      #  LED_GPIO = yes;
-      #  VIBRATOR_GPIO = yes;
-      #})
-      #(helpers: with helpers; {
-      #  USB_GADGET_MANUFACTURER = freeform ''"Pine64"'';
-      #})
-      #(helpers: with helpers; {
-      #  CMD_POWEROFF = lib.mkForce yes;
-      #})
-      #(helpers: with helpers; {
-      #  # Workarounds required for eMMC issues and current patchset.
-      #  MMC_IO_VOLTAGE = yes;
-      #  MMC_SDHCI_SDMA = yes;
-      #  MMC_SPEED_MODE_SET = yes;
-      #  MMC_UHS_SUPPORT = yes;
-      #  MMC_HS400_ES_SUPPORT = yes;
-      #  MMC_HS400_SUPPORT = yes;
-      #})
-    ];
-    ## patches = [
-    ##   #
-    ##   # Generic changes, not device specific
-    ##   #
-
-    ##   # Upstreamable
-    ##   ./0001-adc-rockchip-saradc-Implement-reference-voltage.patch
-    ##   ./0001-mtd-spi-nor-ids-Add-GigaDevice-GD25LQ128E-entry.patch
-
-    ##   # Non-upstreamable
-    ##   ./0001-HACK-Do-not-honor-Rockchip-download-mode.patch
-    ##   ./0001-rk8xx-poweroff-support.patch
-
-    ##   # Subject: [PATCH] phy: rockchip: inno-usb2: fix hang when multiple controllers exit
-    ##   # https://patchwork.ozlabs.org/project/uboot/patch/20210406151059.1187379-1-icenowy@aosc.io/
-    ##   (pkgs.fetchpatch {
-    ##     url = "https://patchwork.ozlabs.org/series/237654/mbox/";
-    ##     sha256 = "0aiw9zk8w4msd3v8nndhkspjify0yq6a5f0zdy6mhzs0ilq896c3";
-    ##   })
-
-    ##   #
-    ##   # Device-specific changes
-    ##   #
-
-    ##   ./0001-pine64-pinephonepro-device-enablement.patch
-    ## ];
   };
-  ## documentation.sections.installationInstructions = builtins.readFile ./INSTALLING.md;
 }
-
