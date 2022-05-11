@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  mkimage = import ./imx-mkimage.nix;
+  mkimage = pkgs.pkgsBuildHost.callPackage ./imx-mkimage.nix {ubootpkgs = pkgs;};
 in
 {
   device = {
@@ -19,7 +19,7 @@ in
     # mmcBootIndex = "?";
   };
 
-  Tow-Boot = with pkgs.Tow-Boot; {
+  Tow-Boot =  {
 
     uBootVersion = "2021.04";
 
@@ -34,31 +34,10 @@ in
 
     builder = {
 
-      additionalArguments = {
-        #mkimage = pkgs.pkgsBuildHost.callPackage ./imx-mkimage.nix {
-        #  BL31 = armTrustedFirmwareIMX8QM;
-        #  imx-firmware = imxFirmware;
-        #  ubootImx8 = pkgs.Tow-Boot.outputs.firmware;
-        #};
-      };
-
       installPhase = ''
-        install -m 0755 u-boot.bin $out/binaries/
-        install -m 0755 spl/u-boot-spl.bin $out/binaries/
-        install -m 0755 u-boot.bin $out/binaries/Tow-Boot.$variant.bin
-        echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ${mkimage {pkgs=pkgs; ubootImx8="$out/binaries/";}}
+        install -m 0755 ${mkimage}/flash.bin $out/binaries/Tow-Boot.$variant.bin
       '';
     };
-
-   # preInstallPhases = [ "showWhatsHappening" ];
-#
-   # showWhatsHappening = ''
-   #   echo !&!&!&!&!&!&!&!&!&!&!&!&!&!&!&
-   #   ls -la
-   #   echo &!&!&!&!&!&!&!&!&!&!&!&!&!&!&!&
-   # '';
-        # 
 
     # Does not build right now, anyway blind UX.
     withLogo = false;

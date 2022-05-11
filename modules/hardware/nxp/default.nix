@@ -44,7 +44,7 @@ in
     (mkIf cfg.nxp-imx8qm.enable {
       system.system = "aarch64-linux";
       Tow-Boot.builder.additionalArguments = {
-        BL31 = "${pkgs.Tow-Boot.armTrustedFirmwareIMX8QM}/bl31.bin";
+        BL31 = "${pkgs.Tow-Boot.armTrustedFirmwareIMX8QM}";
         FIPDIR = "${pkgs.Tow-Boot.imxFirmware}";
       };
     })
