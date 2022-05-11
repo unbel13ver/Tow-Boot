@@ -1,12 +1,15 @@
 { pkgs,
-  ubootImx8,
-  BL31 ? pkgs.Tow-Boot.armTrustedFirmwareIMX8QM,
-  imx-firmware ? pkgs.Tow-Boot.imxFirmware,
+  ubootpkgs ,
+  BL31 ? ubootpkgs.Tow-Boot.armTrustedFirmwareIMX8QM,
+  imx-firmware ? ubootpkgs.Tow-Boot.imxFirmware,
   mx8device ? "iMX8QM"
 }:
 
 with pkgs;
-stdenv.mkDerivation rec {
+let
+  inherit (ubootpkgs.callPackage ./imx-uboot.nix {}) ubootImx8;
+in
+pkgs.stdenv.mkDerivation rec {
   pname = "imx-mkimage";
   version = "lf-5.15.5-1.0.0";
 
@@ -32,7 +35,7 @@ stdenv.mkDerivation rec {
     ls -la ${ubootImx8}
     install -m 0755 ${imx-firmware}/* ${mx8device}
     install -m 0755 ${ubootImx8}/u-boot* ${mx8device}
-    install -m 0755 ${BL31}/* ${mx8device}
+    install -m 0755 ${BL31}/bl31.bin ${mx8device}
   '';
 
   installPhase = ''

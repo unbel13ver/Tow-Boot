@@ -127,7 +127,8 @@ in {
     };
     platform = "imx8qm";
     enableParallelBuilding = true;
-    extraMakeFlags = [ "bl31 SPD=opteed" ];
+    # add SPD=opteed flag to extraMakeFlags in case of OP-TEE
+    extraMakeFlags = [ "bl31" ];
     extraMeta.platforms = ["aarch64-linux"];
     filesToInstall = ["build/${platform}/release/bl31.bin"];
   };
