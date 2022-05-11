@@ -13,6 +13,10 @@ in {
       ref = "lf_v2021.04";
     };
     patches = [];
+    extraConfig = ''
+      CONFIG_CMD_BOOTEFI=y
+      CONFIG_EFI_LOADER=y
+    '';
     enableParallelBuilding = true;
     defconfig = "imx8qm_mek_defconfig";
     extraMeta.platforms = ["aarch64-linux"];
