@@ -16,6 +16,9 @@ in {
     extraConfig = ''
       CONFIG_CMD_BOOTEFI=y
       CONFIG_EFI_LOADER=y
+      CONFIG_BOOTM_EFI=y
+      CONFIG_CMD_BOOTEFI_HELLO=y
+      CONFIG_CMD_BOOTEFI_SELFTEST=y
     '';
     enableParallelBuilding = true;
     defconfig = "imx8qm_mek_defconfig";

@@ -8,6 +8,7 @@
 with pkgs;
 let
   inherit (ubootpkgs.callPackage ./imx-uboot.nix {}) ubootImx8;
+  imxOpteeOs = ubootpkgs.callPackage ./imx-optee-os.nix {pkgs = ubootpkgs;};
 in
 pkgs.stdenv.mkDerivation rec {
   pname = "imx-mkimage";
@@ -36,6 +37,7 @@ pkgs.stdenv.mkDerivation rec {
     install -m 0755 ${imx-firmware}/* ${mx8device}
     install -m 0755 ${ubootImx8}/u-boot* ${mx8device}
     install -m 0755 ${BL31}/bl31.bin ${mx8device}
+    install -m 0755 ${imxOpteeOs}/tee.bin ${mx8device}
   '';
 
   installPhase = ''

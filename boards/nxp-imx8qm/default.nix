@@ -12,11 +12,6 @@ in
 
   hardware = {
     soc = "nxp-imx8qm";
-    # Winbond W25Q16JVUXIM TR SPI NOR Flash, 3V, 16M-bit
-    # TODO: check if it is configured to start from SPI.
-    # SPISize = 16 / 8 * 1024 * 1024; # 16Mb → 2MB
-    # TODO: determine the index
-    # mmcBootIndex = "?";
   };
 
   Tow-Boot =  {
@@ -33,7 +28,6 @@ in
     useDefaultPatches = false; # until ported to 2022.04
 
     builder = {
-
       installPhase = ''
         install -m 0755 ${mkimage}/flash.bin $out/binaries/Tow-Boot.$variant.bin
       '';
