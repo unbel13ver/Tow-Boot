@@ -11,7 +11,7 @@ in
 pkgs.stdenv.mkDerivation rec {
   
   pname = "imxOpteeOs";
-  version = "5.15.5_1.0.0";
+  version = "5.15.32_2.0.0";
 
   nativeBuildInputs = [
     python3
@@ -22,11 +22,12 @@ pkgs.stdenv.mkDerivation rec {
   propagatedBuildInputs = with python3.pkgs; [
     pycryptodomex
     pyelftools
+    cryptography
   ];
 
   src = fetchGit {
     url = "https://source.codeaurora.org/external/imx/imx-optee-os.git";
-    ref = "lf-5.15.5_1.0.0";
+    ref = "lf-5.15.32_2.0.0";
   };
 
   postPatch = ''
