@@ -19,6 +19,7 @@ in {
       CONFIG_BOOTM_EFI=y
       CONFIG_CMD_BOOTEFI_HELLO=y
       CONFIG_CMD_BOOTEFI_SELFTEST=y
+      CONFIG_DM_DEVICE_REMOVE=n
     '';
     enableParallelBuilding = true;
     defconfig = "imx8qm_mek_defconfig";
