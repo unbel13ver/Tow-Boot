@@ -12,7 +12,7 @@ let
 in
 pkgs.stdenv.mkDerivation rec {
   pname = "imx-mkimage";
-  version = "lf-5.15.5-1.0.0";
+  version = "lf-5.15.32_2.0.0";
 
   src = pkgs.fetchgit {
     url = "https://source.codeaurora.org/external/imx/imx-mkimage.git";

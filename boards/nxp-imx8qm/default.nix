@@ -20,7 +20,7 @@ in
 
     src = fetchGit {
         url = "https://source.codeaurora.org/external/imx/uboot-imx.git";
-        ref = "lf_v2021.04";
+        ref = "lf_v2022.04";
     };
 
     defconfig = "imx8qm_mek_defconfig";

@@ -5,25 +5,25 @@
 let
   imxurl = "https://www.nxp.com/lgfiles/NMG/MAD/YOCTO";
 
-  fwHdmiVersion = "8.15";
-  fwScVersion = "1.10.0";
-  fwSecoVersion = "3.8.2";
+  fwHdmiVersion = "8.16";
+  fwScVersion = "1.13.0";
+  fwSecoVersion = "3.8.6";
 
   firmwareHdmi = fetchurl rec {
     url = "${imxurl}/firmware-imx-${fwHdmiVersion}.bin";
-    sha256 = "QQP7jcQBs/EZK9X+mwFumauEcpOiJNa0hHm+fMBOHB8=";
+    sha256 = "Bun+uxE5z7zvxnlRwI0vjowKFqY4CgKyiGjbZuilER0=";
     executable = true;
   };
 
   firmwareSc = fetchurl rec {
     url = "${imxurl}/imx-sc-firmware-${fwScVersion}.bin";
-    sha256 = "aQBefLYrR9SA0NoJJ6ZadwvMMcgroeKjpd8pUXbqCiI=";
+    sha256 = "YUaBIVCeOOTvifhiEIbKgyGsLZYufv5rs2isdSrw4dc=";
     executable = true;
   };
 
   firmwareSeco = fetchurl rec {
     url = "${imxurl}/imx-seco-${fwSecoVersion}.bin";
-    sha256 = "kks3aEZ0c+Z26yy9PP1Z06g97kvKG1Ck0wGNHeAk3RY=";
+    sha256 = "eoG19xn283fsP2jP49hD4dIBRwEQqFQ9k3yVWOM8uKQ=";
     executable = true;
   };
 
@@ -37,7 +37,7 @@ let
 in
 stdenv.mkDerivation {
   pname = "imxFirmware";
-  version = "5.15.X_1.0.0-Yocto";
+  version = "5.15.32_2.0.0-Yocto";
 
   dontPatch = true;
   dontConfigure = true;

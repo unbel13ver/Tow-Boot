@@ -7,10 +7,10 @@ let
 in {
 
   ubootImx8 = buildUBoot {
-    version = "2021.04";
+    version = "2022.04";
     src = fetchGit {
       url = "https://source.codeaurora.org/external/imx/uboot-imx.git";
-      ref = "lf_v2021.04";
+      ref = "lf_v2022.04";
     };
     patches = [];
     extraConfig = ''
