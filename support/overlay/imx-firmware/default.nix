@@ -45,7 +45,7 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out
     cp -vt $out ${lib.concatStringsSep " " filesToInstall}
-    mv $out/*?scfw-tcm.bin $out/scfw_tcm.bin
+    mv $out/mx8qmb0-ahab-container.img $out/mx8qm-ahab-container.img
   '';
 
   meta = with lib; {
