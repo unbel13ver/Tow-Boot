@@ -5,15 +5,8 @@
 let
   imxurl = "https://www.nxp.com/lgfiles/NMG/MAD/YOCTO";
 
-  fwHdmiVersion = "8.16";
   fwScVersion = "1.13.0";
   fwSecoVersion = "3.8.6";
-
-  firmwareHdmi = fetchurl rec {
-    url = "${imxurl}/firmware-imx-${fwHdmiVersion}.bin";
-    sha256 = "Bun+uxE5z7zvxnlRwI0vjowKFqY4CgKyiGjbZuilER0=";
-    executable = true;
-  };
 
   firmwareSc = fetchurl rec {
     url = "${imxurl}/imx-sc-firmware-${fwScVersion}.bin";
@@ -28,8 +21,6 @@ let
   };
 
   filesToInstall = [
-    "firmware-imx-${fwHdmiVersion}/firmware/hdmi/cadence/dpfw.bin"
-    "firmware-imx-${fwHdmiVersion}/firmware/hdmi/cadence/hdmi?xfw.bin"
     "imx-sc-firmware-${fwScVersion}/mx8qm-mek-scfw-tcm.bin"
     "imx-seco-${fwSecoVersion}/firmware/seco/mx8qmb0-ahab-container.img"
   ];
@@ -47,7 +38,6 @@ stdenv.mkDerivation {
   sourceRoot = ".";
 
   unpackPhase = ''
-    ${firmwareHdmi} --auto-accept --force
     ${firmwareSc} --auto-accept --force
     ${firmwareSeco} --auto-accept --force
   '';
