@@ -25,7 +25,7 @@ in
 
     defconfig = "imx8qm_mek_defconfig";
 
-    useDefaultPatches = false; # until ported to 2022.04
+    useDefaultPatches = true;
 
     builder = {
       postPatch = ''

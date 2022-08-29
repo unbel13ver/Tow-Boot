@@ -57,6 +57,8 @@ in
             CMD_BOOTEFI_HELLO = yes;
             CMD_BOOTEFI_SELFTEST = yes;
             DM_DEVICE_REMOVE = no;
+            TOW_BOOT_MENU = yes;
+            TOW_BOOT_MENU_CTRL_C_EXITS = yes;
           })
         ];
     })
