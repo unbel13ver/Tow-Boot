@@ -1,8 +1,5 @@
 { config, lib, pkgs, ... }:
 
-let
-  imxOpteeOs = pkgs.callPackage ./imx-optee-os.nix {inherit pkgs;};
-in
 {
   device = {
     manufacturer = "NXP";
@@ -31,7 +28,7 @@ in
       postPatch = ''
         install -m 0644 $BL31/bl31.bin ./
         install -m 0644 $FWDIR/* ./
-        install -m 0644 ${imxOpteeOs}/tee.bin ./
+        install -m 0644 ${pkgs.Tow-Boot.imx8qmOpTee}/tee.bin ./
         echo "IMAGE A35 tee.bin 0xfe000000" >> board/freescale/imx8qm_mek/uboot-container.cfg
       '';
 

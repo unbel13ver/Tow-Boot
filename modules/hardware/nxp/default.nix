@@ -13,14 +13,14 @@ let
     "nxp-imx8qm"
   ];
   anyNXP = lib.any (soc: config.hardware.socs.${soc}.enable) nxpSOCs;
-  isPhoneUX = config.Tow-Boot.phone-ux.enable;
+  isPhoneUX = false;
 in
 {
   options = {
     hardware.socs = {
       nxp-imx8qm.enable = mkOption {
         type = types.bool;
-        default = false;
+        default = true;
         description = "Enable when SoC is NXP i.MX8QuadMax";
         internal = true;
       };
@@ -34,9 +34,10 @@ in
     (mkIf anyNXP {
       Tow-Boot = {
         # https://community.nxp.com/t5/i-MX-Processors-Knowledge-Base/i-MX8-Boot-process-and-creating-a-bootable-image/ta-p/1101253
-        firmwarePartition = { # TODO CALCULATIONS
+        # the same as dd if=flash.bin of=/dev/sd[x] bs=1k seek=32
+        firmwarePartition = {
           offset = 32 * 1024; # 32KiB into the image, or 64 × 512 long sectors, or 0x8000
-          length = 4 * 1024 * 1024; # Expected max size
+          length = 8 * 1024 * 1024; # Let's have some room for possible FW size change
         };
       };
 
@@ -45,7 +46,7 @@ in
       system.system = "aarch64-linux";
       Tow-Boot.builder.additionalArguments = {
         BL31 = "${pkgs.Tow-Boot.armTrustedFirmwareIMX8QM}";
-        FWDIR = "${pkgs.Tow-Boot.imxFirmware}";
+        FWDIR = "${pkgs.Tow-Boot.imx8qmFirmware}";
       };
       Tow-Boot.config = [
           (helpers: with helpers; {

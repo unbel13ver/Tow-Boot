@@ -70,7 +70,8 @@ in
 
     amlogicFirmware = callPackage ./amlogic-firmware { };
 
-    imxFirmware = callPackage ./imx-firmware { };
+    imx8qmFirmware = callPackage ./imx-firmware/imx8qm/imx-firmware.nix { };
+    imx8qmOpTee = callPackage ./imx-firmware/imx8qm/imx-optee-os.nix { };
 
     gxlimg = callPackage ./gxlimg { };
 
