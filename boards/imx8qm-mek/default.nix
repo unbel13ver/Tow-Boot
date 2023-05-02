@@ -18,7 +18,7 @@
 
     # NXP uses it's own u-boot fork
     src = fetchGit {
-      url = "https://source.codeaurora.org/external/imx/uboot-imx.git";
+      url = "https://github.com/nxp-imx/uboot-imx.git";
       ref = "lf_v2022.04";
     };
 
