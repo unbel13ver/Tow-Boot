@@ -61,6 +61,10 @@ pkgs.stdenv.mkDerivation rec {
     "CFG_TEE_CORE_LOG_LEVEL=0"
     "CROSS_COMPILE=${toolchain}/bin/${toolchain.targetPrefix}"
     "CROSS_COMPILE64=${toolchain}/bin/${toolchain.targetPrefix}"
+    # Newer version of compilers warn about 'LOAD segment with RWX permissions';
+    # for some reason it is needed in this case, so maintainers recommend to
+    # disable this linker warning
+    "LDFLAGS=--no-warn-rwx-segments"
   ];
 
   installPhase = ''
