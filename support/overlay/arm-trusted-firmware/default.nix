@@ -127,7 +127,10 @@ in {
     };
     platform = "imx8qm";
     enableParallelBuilding = true;
-    extraMakeFlags = [ "bl31 SPD=opteed" ];
+    # Newer version of compilers warn about 'LOAD segment with RWX permissions';
+    # for some reason it is needed in this case, so maintainers recommend to
+    # disable this linker warning
+    extraMakeFlags = [ "bl31 SPD=opteed" "PIE_LDFLAGS=--no-warn-rwx-segments LDFLAGS=--no-warn-rwx-segments" ];
     extraMeta.platforms = ["aarch64-linux"];
     filesToInstall = ["build/${platform}/release/bl31.bin"];
   };
