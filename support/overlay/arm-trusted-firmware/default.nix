@@ -122,7 +122,7 @@ in {
 
   armTrustedFirmwareIMX8QM = buildArmTrustedFirmware rec {
     src = fetchGit {
-      url = "https://source.codeaurora.org/external/imx/imx-atf";
+      url = "https://github.com/nxp-imx/imx-atf.git";
       ref = "lf_v2.6";
     };
     platform = "imx8qm";
